@@ -1,0 +1,14 @@
+/* Footer.css */
+.footer {
+    background-color: #1e272e;
+    /* Dark background */
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 30px;
+}
+
+.footer p {
+    margin: 5px 0;
+}
