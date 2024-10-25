@@ -21,14 +21,13 @@ function App() {
   const [error, setError] = useState("");
   const [activeUsers, setActiveUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [showLoginForm, setShowLoginForm] = useState(true); // State to toggle forms
+  const [showLoginForm, setShowLoginForm] = useState(true);
   const [showPicker, setShowPicker] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const loginSectionRef = useRef(null);
 
   const onEmojiClick = (emojiData) => {
-    console.log(emojiData.emoji);
     setInputMessage((prevInput) => prevInput + emojiData.emoji);
     setShowPicker(false);
   };
@@ -36,9 +35,9 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 5000); // 3 seconds delay for loading
+    }, 5000);
 
-    return () => clearTimeout(timer); // Cleanup timer on component unmount
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -67,7 +66,7 @@ function App() {
       const response = await fetch(
         `http://localhost:5000/api/messages/${selectedUser._id}`,
         {
-          headers: { Authorization: user.token },
+          credentials: "include", // Include cookies with the request
         }
       );
       const data = await response.json();
@@ -99,12 +98,13 @@ function App() {
           username: loginUsername,
           password: loginPassword,
         }),
+        credentials: "include", // Include cookies with the request
       });
       const data = await response.json();
       if (response.ok) {
-        setUser(data);
+        setUser(data); // Expecting the user data from the response
         socket.emit("login", data.userId);
-        fetchActiveUsers(data.token);
+        fetchActiveUsers(); // No need for token now
         setError("");
       } else {
         setError(data.error);
@@ -124,11 +124,12 @@ function App() {
           username: registerUsername,
           password: registerPassword,
         }),
+        credentials: "include", // Include cookies with the request
       });
       const data = await response.json();
       if (response.ok) {
         setError("Registration successful. Please log in.");
-        setShowLoginForm(true); // Show login form after successful registration
+        setShowLoginForm(true);
       } else {
         setError(data.error);
       }
@@ -137,17 +138,25 @@ function App() {
     }
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    setMessages([]);
-    setSelectedUser(null);
-    socket.emit("logout");
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:5000/api/logout", {
+        method: "POST",
+        credentials: "include", // Include cookies with the request
+      });
+      setUser(null);
+      setMessages([]);
+      setSelectedUser(null);
+      socket.emit("logout");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
-  const fetchActiveUsers = async (token) => {
+  const fetchActiveUsers = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/users", {
-        headers: { Authorization: token },
+        credentials: "include", // Include cookies with the request
       });
       const data = await response.json();
       setActiveUsers(data);
@@ -345,7 +354,8 @@ function App() {
                       className="emoji-icon"
                       onClick={(e) => {
                         e.preventDefault();
-                        setShowPicker((val) => !val)}}
+                        setShowPicker((val) => !val);
+                      }}
                     >
                       Use Emoji😀
                     </button>
