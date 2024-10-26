@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-import "./App.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import WhyChooseChatterBox from "./components/WhyChooseChatterBox";
+import "bootstrap/dist/css/bootstrap.min.css";
 import Footer from "./components/Footer";
 import EmojiPicker from "emoji-picker-react";
-import { HashLoader } from "react-spinners";
+import "./App.css";
 
 const socket = io("http://localhost:5000");
 
@@ -23,22 +20,14 @@ function App() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showLoginForm, setShowLoginForm] = useState(true);
   const [showPicker, setShowPicker] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const loginSectionRef = useRef(null);
+  const pickerRef = useRef(null);
 
   const onEmojiClick = (emojiData) => {
     setInputMessage((prevInput) => prevInput + emojiData.emoji);
     setShowPicker(false);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     socket.on("message", (message) => {
@@ -173,125 +162,199 @@ function App() {
   const showLogin = () => setShowLoginForm(true);
   const showRegister = () => setShowLoginForm(false);
 
-  if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <HashLoader size={180} color="#61e092" /> {/* Loading Spinner */}
-      </div>
-    );
-  }
+  const emojiPickerStyles = {
+    position: "absolute",
+    bottom: "100%",
+    right: "0",
+    zIndex: 9999, // Ensure picker appears above other elements
+    marginBottom: "10px", // Add some spacing from the input
+  };
 
   if (!user) {
     return (
-      <div className="App">
-        <h1>
-          ChatterBox, Chatting made easy!
-          <div>
+      <div className="container-fluid p-0">
+        {/* Hero Section */}
+        <div className="bg-light py-5 mb-5">
+          <div className="container text-center">
+            <h1 className="display-4 fw-bold text-primary mb-4">
+              ChatterBox, Chatting made easy!
+            </h1>
             <button
+              className="btn btn-primary btn-lg px-4 mb-4"
               onClick={() => {
                 loginSectionRef.current.scrollIntoView({ behavior: "smooth" });
               }}
             >
               Login / Register
             </button>
+            <p className="lead px-4 text-muted">
+              ChatterBox is your go-to platform for seamless real-time
+              messaging. Whether you're catching up with old friends, chatting
+              with your team, or simply staying in touch with family, ChatterBox
+              makes it all possible. Our platform is designed to deliver fast,
+              reliable, and fun communication experiences for everyone.
+            </p>
           </div>
-        </h1>
-        <p>
-          ChatterBox is your go-to platform for seamless real-time messaging.
-          Whether you're catching up with old friends, chatting with your team,
-          or simply staying in touch with family, ChatterBox makes it all
-          possible. Our platform is designed to deliver fast, reliable, and fun
-          communication experiences for everyone.
-        </p>
-        <div className="features-wrapper">
-          <div className="features-container">
-            <h2 className="features-heading">Key Features</h2>
-            <div className="features-list">
-              <div className="feature-item">
-                <h3>💬 Instant Messaging</h3>
-                <p>Exchange messages in real-time with ease.</p>
-              </div>
-              <div className="feature-item">
-                <h3>🔒 Private Chats</h3>
-                <p>
-                  Stay connected with friends, colleagues, and family through
-                  private conversations.
-                </p>
-              </div>
-              <div className="feature-item">
-                <h3>⚡ Seamless Experience</h3>
-                <p>
-                  Enjoy a sleek interface that keeps your chats flowing
-                  smoothly, without distractions.
-                </p>
-              </div>
-              <div className="feature-item">
-                <h3>🟢 Active Users</h3>
-                <p>
-                  Easily see who’s online and start conversations in a click.
-                </p>
-              </div>
-            </div>
-          </div>
-          <img src="/chat1.png" alt="chat" id="chat1" />
         </div>
 
-        <WhyChooseChatterBox />
-        <br />
-        <br />
-        <br />
-        <br />
-        <div className="auth-wrapper">
-          <div>
-            <img src="/chat3.png" className="side-image" />
-          </div>
-          <div className="auth-container">
-            <h2>Please login or register.</h2>
-            <div className="button-container">
-              <button onClick={showLogin}>Login</button>
-              <button onClick={showRegister}>Register</button>
+        {/* Features Section */}
+        <div className="container mb-5">
+          <h2 className="text-center mb-4 fw-bold text-primary">
+            Key Features
+          </h2>
+          <div className="row g-4">
+            <div className="col-md-3">
+              <div className="card h-100 border-0 shadow-sm hover-shadow">
+                <div className="card-body text-center">
+                  <h3 className="h4 mb-3">💬 Instant Messaging</h3>
+                  <p className="text-muted">
+                    Exchange messages in real-time with ease.
+                  </p>
+                </div>
+              </div>
             </div>
-
-            {showLoginForm ? (
-              <form onSubmit={handleLogin} ref={loginSectionRef}>
-                <h2>Already Registered? Login Here!</h2>
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={loginUsername}
-                  onChange={(e) => setLoginUsername(e.target.value)}
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                />
-                <button type="submit">Login</button>
-              </form>
-            ) : (
-              <form onSubmit={handleRegister}>
-                <h2>New Here? Register!</h2>
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={registerUsername}
-                  onChange={(e) => setRegisterUsername(e.target.value)}
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={registerPassword}
-                  onChange={(e) => setRegisterPassword(e.target.value)}
-                />
-                <button type="submit">Register</button>
-              </form>
-            )}
-
-            {error && <p className="error">{error}</p>}
+            <div className="col-md-3">
+              <div className="card h-100 border-0 shadow-sm hover-shadow">
+                <div className="card-body text-center">
+                  <h3 className="h4 mb-3">🔒 Private Chats</h3>
+                  <p className="text-muted">
+                    Stay connected through private conversations.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="card h-100 border-0 shadow-sm hover-shadow">
+                <div className="card-body text-center">
+                  <h3 className="h4 mb-3">⚡ Seamless Experience</h3>
+                  <p className="text-muted">
+                    Enjoy a sleek interface without distractions.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="card h-100 border-0 shadow-sm hover-shadow">
+                <div className="card-body text-center">
+                  <h3 className="h4 mb-3">🟢 Active Users</h3>
+                  <p className="text-muted">
+                    See who's online and start conversations easily.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <img src="/chat2.png" className="side-image right-img" />
+        </div>
+
+        {/* Auth Section */}
+        <div className="container my-5">
+          <div className="row justify-content-center">
+            <div className="col-md-6">
+              <div className="card border-0 shadow">
+                <div className="card-body p-4">
+                  <h2 className="text-center mb-4 text-primary">
+                    Welcome to ChatterBox
+                  </h2>
+                  <div className="d-flex justify-content-center gap-3 mb-4">
+                    <button
+                      className={`btn ${
+                        showLoginForm ? "btn-primary" : "btn-outline-primary"
+                      }`}
+                      onClick={showLogin}
+                    >
+                      Login
+                    </button>
+                    <button
+                      className={`btn ${
+                        !showLoginForm ? "btn-primary" : "btn-outline-primary"
+                      }`}
+                      onClick={showRegister}
+                    >
+                      Register
+                    </button>
+                  </div>
+
+                  {showLoginForm ? (
+                    <form
+                      onSubmit={handleLogin}
+                      ref={loginSectionRef}
+                      className="needs-validation"
+                    >
+                      <h3 className="h4 text-center mb-4 text-secondary">
+                        Already Registered? Login Here!
+                      </h3>
+                      <div className="mb-3">
+                        <input
+                          type="text"
+                          className="form-control form-control-lg"
+                          placeholder="Username"
+                          value={loginUsername}
+                          onChange={(e) => setLoginUsername(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <input
+                          type="password"
+                          className="form-control form-control-lg"
+                          placeholder="Password"
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="btn btn-primary w-100 btn-lg mb-3"
+                      >
+                        Login
+                      </button>
+                    </form>
+                  ) : (
+                    <form
+                      onSubmit={handleRegister}
+                      className="needs-validation"
+                    >
+                      <h3 className="h4 text-center mb-4 text-secondary">
+                        New Here? Register!
+                      </h3>
+                      <div className="mb-3">
+                        <input
+                          type="text"
+                          className="form-control form-control-lg"
+                          placeholder="Username"
+                          value={registerUsername}
+                          onChange={(e) => setRegisterUsername(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <input
+                          type="password"
+                          className="form-control form-control-lg"
+                          placeholder="Password"
+                          value={registerPassword}
+                          onChange={(e) => setRegisterPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="btn btn-primary w-100 btn-lg mb-3"
+                      >
+                        Register
+                      </button>
+                    </form>
+                  )}
+
+                  {error && (
+                    <div className="alert alert-danger text-center">
+                      {error}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <Footer />
@@ -299,83 +362,123 @@ function App() {
     );
   }
 
+  // Chat Interface
   return (
-    <div className="App">
-      <h1>ChatterBox, Chatting made easy!</h1>
-      <p>
-        Welcome, {user.username} to ChatterBox! <br />
-        <br />
-        <button onClick={handleLogout}>Logout</button>
-      </p>
-      <div className="chat-container">
-        <div className="user-list">
-          <h2>Chat with whom?</h2>
-          <ul>
+    <div className="container-fluid vh-100 d-flex flex-column">
+      <div className="row py-3 bg-light border-bottom">
+        <div className="col-12 text-center">
+          <h1 className="h3 text-primary mb-0">ChatterBox</h1>
+          <p className="mb-2">
+            Welcome, <span className="fw-bold">{user.username}</span>!
+            <button
+              className="btn btn-outline-danger btn-sm ms-3"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </p>
+        </div>
+      </div>
+
+      <div className="row flex-grow-1 overflow-hidden">
+        <div className="col-md-3 border-end p-0">
+          <div className="p-3 bg-light border-bottom">
+            <h2 className="h5 mb-0">Active Users</h2>
+          </div>
+          <div
+            className="list-group list-group-flush overflow-auto"
+            style={{ maxHeight: "calc(100vh - 200px)" }}
+          >
             {activeUsers.map((u) => (
-              <li
+              <button
                 key={u._id}
                 onClick={() => selectUser(u)}
-                className={selectedUser?._id === u._id ? "selected" : ""}
+                className={`list-group-item list-group-item-action ${
+                  selectedUser?._id === u._id ? "active" : ""
+                }`}
               >
                 {u.username}
-              </li>
+              </button>
             ))}
-          </ul>
+          </div>
         </div>
-        <div className="chat-window">
+
+        <div className="col-md-9 p-0 d-flex flex-column">
           {selectedUser ? (
             <>
-              <h2>Chat with {selectedUser.username}</h2>
-              <div className="messages">
+              <div className="p-3 bg-light border-bottom">
+                <h2 className="h5 mb-0">Chat with {selectedUser.username}</h2>
+              </div>
+              <div
+                className="flex-grow-1 p-3 overflow-auto"
+                style={{ maxHeight: "calc(100vh - 250px)" }}
+              >
                 {messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`message ${
-                      msg.sender._id === user.userId ? "sent" : "received"
+                    className={`d-flex mb-3 ${
+                      msg.sender._id === user.userId
+                        ? "justify-content-end"
+                        : "justify-content-start"
                     }`}
                   >
-                    <strong>{msg.sender.username}: </strong>
-                    {msg.content}
+                    <div
+                      className={`rounded p-3 ${
+                        msg.sender._id === user.userId
+                          ? "bg-primary text-white"
+                          : "bg-light border"
+                      }`}
+                      style={{ maxWidth: "75%" }}
+                    >
+                      <div className="small mb-1 opacity-75">
+                        {msg.sender.username}
+                      </div>
+                      {msg.content}
+                    </div>
                   </div>
                 ))}
               </div>
 
-              <div className="chat-input-container">
-                <form onSubmit={sendMessage} className="chat-form">
+              <div className="p-3 border-top bg-light position-relative">
+                <form onSubmit={sendMessage} className="d-flex gap-2">
                   <input
                     type="text"
+                    className="form-control"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     placeholder="Type a message..."
                   />
-
-                  <div className="picker-container">
+                  <div className="position-relative">
                     <button
-                      className="emoji-icon"
+                      type="button"
+                      className="btn btn-outline-secondary"
                       onClick={(e) => {
                         e.preventDefault();
-                        setShowPicker((val) => !val);
+                        setShowPicker((prev) => !prev);
                       }}
                     >
-                      Use Emoji😀
+                      😀
                     </button>
-
                     {showPicker && (
-                      <div className="emoji-picker-wrapper">
+                      <div style={emojiPickerStyles} ref={pickerRef}>
                         <EmojiPicker
-                          pickerStyle={{ width: "200px" }}
                           onEmojiClick={onEmojiClick}
+                          width={300}
+                          height={400}
                         />
                       </div>
                     )}
-
-                    <button type="submit">Send</button>
                   </div>
+                  <button type="submit" className="btn btn-primary">
+                    Send
+                  </button>
                 </form>
               </div>
             </>
           ) : (
-            <p>Select someone to start chatting!</p>
+            <div className="d-flex align-items-center justify-content-center h-100 text-muted">
+              <p className="mb-0">Select someone to start chatting!</p>
+            </div>
           )}
         </div>
       </div>
