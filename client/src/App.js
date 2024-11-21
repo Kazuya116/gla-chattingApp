@@ -14,7 +14,7 @@ function App() {
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [registerUsername, setRegisterUsername] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
+  const [registerPassword, setRegisterPassword] = useState(""); 
   const [error, setError] = useState("");
   const [activeUsers, setActiveUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -63,7 +63,7 @@ function App() {
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
-  };
+  };  
 
   const sendMessage = (e) => {
     e.preventDefault();
